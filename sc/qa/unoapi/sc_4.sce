@@ -36,6 +36,8 @@
 # The css::text::XTextRange test fails often when the weak SHF_ContentObj is
 # already gone. If just this test is disabled, later tests of this object fail
 # too, so this disables the whole interface.
+# Same for ScHeaderFooterTextCursor.
+# -o sc.ScHeaderFooterTextCursor
 # -o sc.ScHeaderFooterTextObj
 -o sc.ScIndexEnumeration_CellAnnotationsEnumeration
 -o sc.ScIndexEnumeration_CellAreaLinksEnumeration
