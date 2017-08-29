@@ -135,7 +135,6 @@ public:
     long            GetResult() const;
 private:
     bool            ImplStartExecuteModal();
-    static void     ImplEndExecuteModal();
 public:
 
     // Dialog::Execute replacement API

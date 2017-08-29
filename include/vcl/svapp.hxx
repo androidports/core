@@ -543,7 +543,7 @@ public:
 
      @returns   true if in main, false if not in main
 
-     @see IsInExecute, IsInModalMode
+     @see IsInExecute
     */
     static bool                 IsInMain();
 
@@ -551,17 +551,9 @@ public:
 
      @returns   true if in the event loop, false if not
 
-     @see IsInMain, IsInModalMode
+     @see IsInMain
     */
     static bool                 IsInExecute();
-
-    /** Queries whether application has a modal dialog active.
-
-     @returns   true if a modal dialog is active, false if not
-
-     @see IsInMain, IsInExecute
-    */
-    static bool                 IsInModalMode();
 
     /** Return how many events are being dispatched.
 

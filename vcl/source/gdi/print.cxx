@@ -1073,11 +1073,8 @@ bool Printer::Setup( vcl::Window* pWindow, bool bPapersizeFromSetup )
 
     pFrame = pWindow->ImplGetFrame();
     ReleaseGraphics();
-    ImplSVData* pSVData = ImplGetSVData();
-    pSVData->maAppData.mnModalMode++;
     nImplSysDialog++;
     bool bSetup = mpInfoPrinter->Setup( pFrame, &rData );
-    pSVData->maAppData.mnModalMode--;
     nImplSysDialog--;
     if ( bSetup )
     {

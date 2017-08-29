@@ -823,14 +823,7 @@ bool Dialog::ImplStartExecuteModal()
 
     Show();
 
-    pSVData->maAppData.mnModalMode++;
     return true;
-}
-
-void Dialog::ImplEndExecuteModal()
-{
-    ImplSVData* pSVData = ImplGetSVData();
-    pSVData->maAppData.mnModalMode--;
 }
 
 void Dialog::PrePaint(vcl::RenderContext& rRenderContext)
@@ -903,8 +896,6 @@ short Dialog::Execute()
     // (the latter should not happen, but better safe than sorry
     while ( !xWindow->IsDisposed() && mbInExecute )
         Application::Yield();
-
-    ImplEndExecuteModal();
 
 #ifdef DBG_UTIL
     assert (!mpDialogParent || !mpDialogParent->IsDisposed());
@@ -987,7 +978,6 @@ void Dialog::EndDialog( long nResult )
 
         if ( mpDialogImpl->mbStartedModal )
         {
-            ImplEndExecuteModal();
             if (mpDialogImpl->maEndDialogHdl.IsSet())
             {
                 mpDialogImpl->maEndDialogHdl.Call( *this );

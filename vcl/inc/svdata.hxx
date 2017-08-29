@@ -139,7 +139,6 @@ struct ImplSVAppData
     VclPtr<ImplWheelWindow> mpWheelWindow;                  // WheelWindow
     sal_uInt64              mnLastInputTime = 0;            // GetLastInputTime()
     sal_uInt16              mnDispatchLevel = 0;            // DispatchLevel
-    sal_uInt16              mnModalMode = 0;                // ModalMode Count
     SystemWindowFlags       mnSysWinMode = SystemWindowFlags(0); // Mode, when SystemWindows should be created
     bool                    mbInAppMain = false;            // is Application::Main() on stack
     bool                    mbInAppExecute = false;         // is Application::Execute() on stack

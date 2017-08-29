@@ -582,11 +582,6 @@ bool Application::IsInExecute()
     return ImplGetSVData()->maAppData.mbInAppExecute;
 }
 
-bool Application::IsInModalMode()
-{
-    return (ImplGetSVData()->maAppData.mnModalMode != 0);
-}
-
 sal_uInt16 Application::GetDispatchLevel()
 {
     return ImplGetSVData()->maAppData.mnDispatchLevel;
