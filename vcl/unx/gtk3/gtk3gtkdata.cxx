@@ -777,47 +777,24 @@ void GtkSalTimer::Stop()
     }
 }
 
-gboolean GtkData::userEventFn( gpointer data )
-{
-    gboolean bContinue = FALSE;
-    GtkData *pThis = static_cast<GtkData *>(data);
-    SalGenericData *pData = GetGenericData();
-    SolarMutexGuard aGuard;
-    const SalGenericDisplay *pDisplay = pData->GetDisplay();
-    if (pDisplay)
-    {
-        OSL_ASSERT(static_cast<const SalGenericDisplay *>(pThis->GetGtkDisplay()) == pDisplay);
-        {
-            osl::MutexGuard g (pThis->GetGtkDisplay()->getEventGuardMutex());
-
-            if( !pThis->GetGtkDisplay()->HasUserEvents() )
-            {
-                if( pThis->m_pUserEvent )
-                {
-                    g_source_unref (pThis->m_pUserEvent);
-                    pThis->m_pUserEvent = nullptr;
-                }
-                bContinue = FALSE;
-            }
-            else
-                bContinue = TRUE;
-        }
-        pThis->GetGtkDisplay()->DispatchInternalEvent();
-    }
-
-    return bContinue;
-}
-
 extern "C" {
     static gboolean call_userEventFn( void *data )
     {
+        GtkData *pThis = static_cast<GtkData *>(data);
         SolarMutexGuard aGuard;
-        return GtkData::userEventFn( data );
+        const SalGenericDisplay *pDisplay = GetGenericData()->GetDisplay();
+        if ( pDisplay )
+        {
+            GtkSalDisplay *pThisDisplay = pThis->GetGtkDisplay();
+            assert(static_cast<const SalGenericDisplay *>(pThisDisplay) == pDisplay);
+            pThisDisplay->DispatchInternalEvent();
+        }
+        return TRUE;
     }
 }
 
 // hEventGuard_ held during this invocation
-void GtkData::PostUserEvent()
+void GtkData::TriggerUserEventProcessing()
 {
     if (m_pUserEvent)
         g_main_context_wakeup (nullptr); // really needed ?
@@ -835,24 +812,36 @@ void GtkData::PostUserEvent()
     }
 }
 
-void GtkSalDisplay::PostUserEvent()
+void GtkData::TriggerAllUserEventsProcessed()
 {
-    GetGtkSalData()->PostUserEvent();
+    assert( m_pUserEvent );
+    g_source_destroy( m_pUserEvent );
+    g_source_unref( m_pUserEvent );
+    m_pUserEvent = nullptr;
+}
+
+void GtkSalDisplay::TriggerUserEventProcessing()
+{
+    GetGtkSalData()->TriggerUserEventProcessing();
+}
+
+void GtkSalDisplay::TriggerAllUserEventsProcessed()
+{
+    GetGtkSalData()->TriggerAllUserEventsProcessed();
 }
 
 GtkWidget* GtkSalDisplay::findGtkWidgetForNativeHandle(sal_uIntPtr hWindow) const
 {
-    for (auto it = m_aFrames.begin(); it != m_aFrames.end(); ++it)
+    for (auto pSalFrame : m_aFrames )
     {
-        SalFrame* pFrame = *it;
-        const SystemEnvData* pEnvData = pFrame->GetSystemData();
+        const SystemEnvData* pEnvData = pSalFrame->GetSystemData();
         if (pEnvData->aWindow == hWindow)
             return GTK_WIDGET(pEnvData->pWidget);
     }
     return nullptr;
 }
 
-void GtkSalDisplay::deregisterFrame( SalFrame* pFrame )
+void GtkSalDisplay::deregisterFrame( const SalFrame* pFrame )
 {
     if( m_pCapture == pFrame )
     {
