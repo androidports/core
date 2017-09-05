@@ -136,24 +136,6 @@ SAL_WNODEPRECATED_DECLARATIONS_PUSH
                 }
             }
 
-            // #i90083# handle frame switching
-            // FIXME: lousy workaround
-            if( (nModMask & (NSControlKeyMask|NSAlternateKeyMask)) == 0 )
-            {
-                if( [[pEvent characters] isEqualToString: @"<"] ||
-                    [[pEvent characters] isEqualToString: @"~"] )
-                {
-                    [self cycleFrameForward: pFrame];
-                    return;
-                }
-                else if( [[pEvent characters] isEqualToString: @">"] ||
-                         [[pEvent characters] isEqualToString: @"`"] )
-                {
-                    [self cycleFrameBackward: pFrame];
-                    return;
-                }
-            }
-
             // get information whether the event was handled; keyDown returns nothing
             GetSalData()->maKeyEventAnswer[ pEvent ] = false;
             bool bHandled = false;
@@ -243,77 +225,6 @@ SAL_WNODEPRECATED_DECLARATIONS_POP
 -(void)sendSuperEvent:(NSEvent*)pEvent
 {
     [super sendEvent: pEvent];
-}
-
--(void)cycleFrameForward: (AquaSalFrame*)pCurFrame
-{
-    // find current frame in list
-    auto &rFrames( GetSalData()->mpFirstInstance->getFrames() );
-    auto it = rFrames.find( pCurFrame );
-    if( it != rFrames.end() )
-    {
-        ++it;
-        // now find the next frame (or end)
-        for( ; it != rFrames.end(); ++it )
-        {
-            auto pFrame = static_cast<const AquaSalFrame*>( *it );
-            if( pFrame->mpDockMenuEntry != nullptr && pFrame->mbShown )
-            {
-                [pFrame->getNSWindow() makeKeyAndOrderFront: NSApp];
-                return;
-            }
-        }
-        // cycle around, find the next up to pCurFrame
-        for( it = rFrames.begin(); *it != pCurFrame; ++it )
-        {
-            auto pFrame = static_cast<const AquaSalFrame*>( *it );
-            if( pFrame->mpDockMenuEntry != nullptr && pFrame->mbShown )
-            {
-                [pFrame->getNSWindow() makeKeyAndOrderFront: NSApp];
-                return;
-            }
-        }
-    }
-}
-
-template< class Iterator >
-std::reverse_iterator<Iterator> make_reverse_iterator( Iterator i )
-{
-    return std::reverse_iterator<Iterator>(i);
-}
-
--(void)cycleFrameBackward: (AquaSalFrame*)pCurFrame
-{
-    // do the same as cycleFrameForward only with a reverse iterator
-
-    // find current frame in list
-    auto &rFrames( GetSalData()->mpFirstInstance->getFrames() );
-    auto search_it = rFrames.find( pCurFrame );
-    if( search_it != rFrames.end() )
-    {
-        auto it = ::make_reverse_iterator( search_it );
-        ++it;
-        // now find the next frame (or end)
-        for( ; it != rFrames.rend(); ++it )
-        {
-            auto pFrame = static_cast<const AquaSalFrame*>( *it );
-            if( pFrame->mpDockMenuEntry != nullptr && pFrame->mbShown )
-            {
-                [pFrame->getNSWindow() makeKeyAndOrderFront: NSApp];
-                return;
-            }
-        }
-        // cycle around, find the next up to pCurFrame
-        for( it = rFrames.rbegin(); *it != pCurFrame; ++it )
-        {
-            auto pFrame = static_cast<const AquaSalFrame*>( *it );
-            if( pFrame->mpDockMenuEntry != nullptr && pFrame->mbShown )
-            {
-                [pFrame->getNSWindow() makeKeyAndOrderFront: NSApp];
-                return;
-            }
-        }
-    }
 }
 
 -(NSMenu*)applicationDockMenu:(NSApplication *)sender
