@@ -814,6 +814,22 @@ dragonfly*)
     ;;
 
 linux-android*)
+    if test "$ANDROID_PORTS"; then
+    test_gtk=yes
+    build_gstreamer_1_0=no
+    build_gstreamer_0_10=no
+    test_tde=yes
+    test_kde4=yes
+    if test "$enable_fuzzers" != yes; then
+        test_freetype=yes
+        test_fontconfig=yes
+    else
+        test_freetype=no
+        test_fontconfig=no
+        BUILD_TYPE="$BUILD_TYPE FONTCONFIG FREETYPE"
+    fi
+    _os=Linux
+    else
     build_gstreamer_1_0=no
     build_gstreamer_0_10=no
     enable_lotuswordpro=no
@@ -835,7 +851,9 @@ linux-android*)
     test_randr=no
     test_xrender=no
     _os=Android
+    fi
 
+    if test -z "$ANDROID_PORTS"; then
     if test -z "$with_android_ndk"; then
         AC_MSG_ERROR([the --with-android-ndk option is mandatory, unless it is available at external/android-ndk/.])
     fi
@@ -848,6 +866,7 @@ linux-android*)
     if test ! -f "$ANDROID_NDK_HOME/platforms/android-${ANDROID_API_LEVEL}/arch-${ANDROID_ARCH}/usr/lib/libc.a"; then
         AC_MSG_ERROR([the --with-android-ndk option does not point to an Android NDK])
     fi
+    fi
 
     AC_DEFINE(HAVE_FT_FACE_GETCHARVARIANTINDEX)
     BUILD_TYPE="$BUILD_TYPE CAIRO FONTCONFIG FREETYPE"
@@ -859,6 +878,7 @@ linux-android*)
 esac
 
 if echo "$host_os" | grep -q linux-android ; then
+    if test -z "$ANDROID_PORTS"; then
     if test -z "$with_android_sdk"; then
         AC_MSG_ERROR([the --with-android-sdk option is mandatory, unless it is available at external/android-sdk-linux/.])
     fi
@@ -883,6 +903,7 @@ if echo "$host_os" | grep -q linux-android ; then
         add_warning "android support repository not found - install with"
         add_warning "    $ANDROID_SDK_HOME/tools/android update sdk -u --filter extra-android-m2repository"
         add_warning "to allow the build to download the specified version of the android support libraries"
+    fi
     fi
 fi
 
@@ -2389,6 +2410,12 @@ dnl ===================================================================
 AC_ARG_WITH(system-icu-for-build,
     AS_HELP_STRING([--with-system-icu-for-build=yes/no/force],
         [Use icu already on system for build tools (cross-compilation only).]))
+AC_ARG_WITH(system-nss-for-build,
+    AS_HELP_STRING([--with-system-nss-for-build=yes/no],
+        [Use nss already on system for build tools (cross-compilation only).]))
+AC_ARG_WITH(system-liblangtag-for-build,
+    AS_HELP_STRING([--with-system-liblangtag-for-build=yes/no],
+        [Use liblangtag already on system for build tools (cross-compilation only).]))
 
 
 dnl ===================================================================
@@ -4261,11 +4288,19 @@ linux-gnu*)
     ;;
 
 linux-android*)
+    if test "$ANDROID_PORTS"; then
+    COM=GCC
+    USING_X11=TRUE
+    OS=LINUX
+    RTL_OS=Linux
+    P_SEP=:
+    else
     COM=GCC
     USING_X11=
     OS=ANDROID
     RTL_OS=Android
     P_SEP=:
+    fi
 
     case "$host_cpu" in
 
@@ -4466,6 +4501,7 @@ dnl machine when doing cross-compilation
 dnl ===================================================================
 
 m4_pattern_allow([PKG_CONFIG_FOR_BUILD])
+m4_pattern_allow([PKG_CONFIG_PATH_FOR_BUILD])
 m4_pattern_allow([PKG_CONFIG_LIBDIR])
 if test "$cross_compiling" = "yes"; then
     AC_MSG_CHECKING([for BUILD platform configuration])
@@ -4495,21 +4531,25 @@ if test "$cross_compiling" = "yes"; then
     cp configure CONF-FOR-BUILD
     test -d config_build && cp -p config_build/*.h CONF-FOR-BUILD/config_host 2>/dev/null
     (
+    unset PKG_CONFIG_PATH ACLOCAL_PATH
     unset COM USING_X11 OS CPUNAME
-    unset CC CXX SYSBASE CFLAGS
+    unset CC CXX SYSBASE CFLAGS CXXFLAGS LDFLAGS LIBS
     unset AR NM OBJDUMP PKG_CONFIG RANLIB READELF STRIP
     unset CPPUNIT_CFLAGS CPPUNIT_LIBS
     unset LIBXML_CFLAGS LIBXML_LIBS LIBXSLT_CFLAGS LIBXSLT_LIBS XSLTPROC PKG_CONFIG_LIBDIR
     test -n "$CC_FOR_BUILD" && export CC="$CC_FOR_BUILD"
     test -n "$CXX_FOR_BUILD" && export CXX="$CXX_FOR_BUILD"
     test -n "$PKG_CONFIG_FOR_BUILD" && export PKG_CONFIG="$PKG_CONFIG_FOR_BUILD"
+    test -n "$PKG_CONFIG_PATH_FOR_BUILD" && export PKG_CONFIG_PATH="$PKG_CONFIG_PATH_FOR_BUILD"
     cd CONF-FOR-BUILD
     sub_conf_opts=""
     test -n "$enable_ccache" && sub_conf_opts="$sub_conf_opts --enable-ccache=$enable_ccache"
     test -n "$with_ant_home" && sub_conf_opts="$sub_conf_opts --with-ant-home=$with_ant_home"
     test $with_junit = no && sub_conf_opts="$sub_conf_opts --without-junit"
     test -n "$TARFILE_LOCATION" && sub_conf_opts="$sub_conf_opts --with-external-tar=$TARFILE_LOCATION"
-    test "$with_system_icu_for_build" = "yes" -o "$with_system_icu_for_build" = "force" && sub_conf_opts="$sub_conf_opts --with-system-icu"
+    test "$with_system_icu_for_build" = "yes" -o "$with_system_icu_for_build" = "force" && sub_conf_opts="$sub_conf_opts --with-system-icu" && unset ICU_CFLAGS ICU_LIBS
+    test "$with_system_nss_for_build" = "yes" && sub_conf_opts="$sub_conf_opts --with-system-nss" && unset NSS_CFLAGS NSS_LIBS
+    test "$with_system_liblangtag_for_build" = "yes" && sub_conf_opts="$sub_conf_opts --with-system-liblangtag" && unset LIBLANGTAG_CFLAGS LIBLANGTAG_LIBS
     sub_conf_opts="$sub_conf_opts $with_build_platform_configure_options"
     # Don't bother having configure look for stuff not needed for the build platform anyway
     ./configure \
@@ -9103,6 +9143,7 @@ You can use --with-system-icu-for-build=force to use it anyway.])
             ICU_MINOR=""
         fi
     fi
+    PKG_CHECK_MODULES(ICU,icu-uc icu-i18n)
 else
     AC_MSG_RESULT([internal])
     SYSTEM_ICU=
@@ -10237,10 +10278,12 @@ elif test $_os = WINNT; then
     ENABLE_OPENGL_CANVAS=TRUE
 else
     if test "$USING_X11" = TRUE; then
+    if test -z "$ANDROID_PORTS"; then
         AC_CHECK_LIB(GL, glBegin, [:], AC_MSG_ERROR([libGL required.]))
         ENABLE_OPENGL_TRANSITIONS=TRUE
         AC_DEFINE(HAVE_FEATURE_OPENGL,1)
         ENABLE_OPENGL_CANVAS=TRUE
+    fi
     fi
 fi
 
@@ -12101,6 +12144,7 @@ fi
 AC_SUBST(OOO_VENDOR)
 
 if echo "$host_os" | grep -q linux-android ; then
+    if test -z "$ANDROID_PORTS"; then
     ANDROID_PACKAGE_NAME=
     AC_MSG_CHECKING([for Android package name])
     if test -z "$with_android_package_name" -o "$with_android_package_name" = "no"; then
@@ -12117,6 +12161,7 @@ if echo "$host_os" | grep -q linux-android ; then
         AC_MSG_RESULT([$ANDROID_PACKAGE_NAME])
     fi
     AC_SUBST(ANDROID_PACKAGE_NAME)
+    fi
 fi
 
 AC_MSG_CHECKING([whether to install the compat oo* wrappers])
