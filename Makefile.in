@@ -274,7 +274,7 @@ help showmodules gbuildtoide:
 	$(MAKE) $(PARALLELISM_OPTION) $(GMAKE_OPTIONS) -f $(SRCDIR)/Makefile.gbuild $@
 
 cross-toolset: bootstrap fetch
-	$(MAKE) gb_Side=build $(PARALLELISM_OPTION) $(GMAKE_OPTIONS) -f $(SRCDIR)/Makefile.gbuild build-tools
+	$(MAKE) gb_Side=build $(PARALLELISM_OPTION) $(GMAKE_OPTIONS) CFLAGS="" CXXFLAGS="" LDFLAGS="" LIBS="" -f $(SRCDIR)/Makefile.gbuild build-tools
 
 
 #
