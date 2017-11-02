@@ -112,6 +112,7 @@ $(call gb_ExternalProject_get_state_target,liborcus,build) :
 			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
 		&& $(if $(verbose),V=1) \
 		   $(MAKE) \
+			CXXFLAGS='$(liborcus_CXXFLAGS) $(MDDS_CFLAGS)' \
 		$(if $(filter MACOSX,$(OS)),\
 			&& $(PERL) $(SRCDIR)/solenv/bin/macosx-change-install-names.pl shl OOO \
 				$(gb_Package_SOURCEDIR_liborcus)/src/liborcus/.libs/liborcus-0.12.0.dylib \
