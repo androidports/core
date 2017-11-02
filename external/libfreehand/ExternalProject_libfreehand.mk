@@ -25,7 +25,7 @@ $(eval $(call gb_ExternalProject_use_externals,libfreehand,\
 $(call gb_ExternalProject_get_state_target,libfreehand,build) :
 	$(call gb_ExternalProject_run,build,\
 		export PKG_CONFIG="" \
-		&& export CXXFLAGS="$(CXXFLAGS) $(ICU_UCHAR_TYPE)" \
+		&& export CXXFLAGS="$(CXXFLAGS) $(CXXFLAGS_CXX11) $(ICU_UCHAR_TYPE)" \
 		&& MAKE=$(MAKE) ./configure \
 			--with-pic \
 			--enable-static \
@@ -38,6 +38,7 @@ $(call gb_ExternalProject_get_state_target,libfreehand,build) :
 			$(if $(verbose),--disable-silent-rules,--enable-silent-rules) \
 			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
 		&& $(MAKE) \
+			CXXFLAGS="$(CXXFLAGS) $(CXXFLAGS_CXX11) $(ICU_UCHAR_TYPE)" \
 	)
 
 # vim: set noet sw=4 ts=4:
