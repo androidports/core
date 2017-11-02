@@ -41,6 +41,7 @@ $(call gb_ExternalProject_get_state_target,libzmf,build) :
 			ax_cv_cxx_compile_cxx11=yes \
 			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
 		&& $(MAKE) -C src/lib \
+			CXXFLAGS="$(CXXFLAGS) $(CXXFLAGS_CXX11) $(if $(SYSTEM_BOOST),$(BOOST_CPPFLAGS),-I$(call gb_UnpackedTarball_get_dir,boost))" \
 	)
 
 # vim: set noet sw=4 ts=4:
