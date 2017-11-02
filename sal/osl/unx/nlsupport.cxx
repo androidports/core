@@ -25,7 +25,7 @@
 
 #include "nlsupport.hxx"
 
-#if defined(LINUX) || defined(SOLARIS) || defined(NETBSD) || \
+#if (defined(LINUX) && !defined(ANDROID_PORTS)) || defined(SOLARIS) || defined(NETBSD) || \
     defined(FREEBSD) || defined(MACOSX)  || defined(IOS) || defined(OPENBSD) || \
     defined(DRAGONFLY)
 #include <pthread.h>

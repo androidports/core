@@ -30,7 +30,7 @@
 #include <cmath>
 #include <numeric>
 
-#if defined(ANDROID)
+#if defined(ANDROID) || defined(ANDROID_PORTS)
 namespace std
 {
 template<typename T>

@@ -47,7 +47,7 @@ static void do_pagein (const char * filename)
 int isRotational(char const * path)
 {
     int ret = 1;
-#ifdef LINUX
+#if defined(LINUX) && !defined(ANDROID_PORTS)
     FILE * fp = NULL;
     char fullpath[4096];
     struct stat out;
