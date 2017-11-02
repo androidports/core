@@ -41,4 +41,10 @@ $(eval $(call gb_UnpackedTarball_add_patches,libmwaw,\
 	external/libmwaw/0001-ofz-1037-resize-vector-correctly.patch.1 \
 ))
 
+ifeq ($(ANDROID_PORTS),1)
+$(eval $(call gb_UnpackedTarball_add_patches,libmwaw, \
+    external/libmwaw/android.patch \
+))
+endif
+
 # vim: set noet sw=4 ts=4:
