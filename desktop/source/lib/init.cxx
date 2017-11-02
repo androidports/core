@@ -102,7 +102,7 @@ using namespace vcl;
 using namespace desktop;
 using namespace utl;
 
-#if defined(ANDROID)
+#if defined(ANDROID) || defined(ANDROID_PORTS)
 namespace std
 {
 template<typename T>

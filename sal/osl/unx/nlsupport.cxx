@@ -29,7 +29,7 @@
 
 #include "nlsupport.hxx"
 
-#if defined(LINUX) || defined(__sun) || defined(NETBSD) || \
+#if (defined(LINUX) && !defined(ANDROID_PORTS)) || defined(__sun) || defined(NETBSD) || \
     defined(FREEBSD) || defined(MACOSX)  || defined(IOS) || defined(OPENBSD) || \
     defined(DRAGONFLY)
 #if !defined(MACOSX) && !defined(IOS)

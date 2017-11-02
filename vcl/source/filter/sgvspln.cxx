@@ -24,7 +24,7 @@
 #include <sgvspln.hxx>
 #include <cmath>
 
-#if defined(ANDROID)
+#if defined(ANDROID) || defined(ANDROID_PORTS)
 namespace std
 {
 template<typename T>
