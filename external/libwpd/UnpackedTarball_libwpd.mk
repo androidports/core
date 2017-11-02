@@ -27,4 +27,10 @@ $(eval $(call gb_UnpackedTarball_add_patches,libwpd,\
 endif
 endif
 
+ifeq ($(ANDROID_PORTS),1)
+$(eval $(call gb_UnpackedTarball_add_patches,libwpd,\
+	external/libwpd/android.patch \
+))
+endif
+
 # vim: set noet sw=4 ts=4:
