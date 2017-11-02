@@ -106,7 +106,7 @@ using ::css::io::XOutputStream;
 using ::sax_fastparser::FSHelperPtr;
 using ::sax_fastparser::FastSerializerHelper;
 
-#if defined(ANDROID)
+#if defined(ANDROID) || defined(ANDROID_PORTS)
 namespace std
 {
 template<typename T>

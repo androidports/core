@@ -28,7 +28,7 @@
 #include <salgdi.hxx>
 #include <unicode/uchar.h>
 
-#if defined(ANDROID)
+#if defined(ANDROID) || defined(ANDROID_PORTS)
 namespace std
 {
 template<typename T>

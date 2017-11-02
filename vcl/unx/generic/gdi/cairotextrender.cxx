@@ -38,7 +38,7 @@
 #include <cairo-ft.h>
 #include "CommonSalLayout.hxx"
 
-#ifdef ANDROID
+#if defined(ANDROID) || defined(ANDROID_PORTS)
 namespace std
 {
 double fmax(double x, double y)

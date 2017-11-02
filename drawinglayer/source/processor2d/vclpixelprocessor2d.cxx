@@ -57,7 +57,7 @@
 
 #include <com/sun/star/table/BorderLineStyle.hpp>
 
-#if defined(ANDROID)
+#if defined(ANDROID) || defined(ANDROID_PORTS)
 namespace std
 {
 template<typename T>
