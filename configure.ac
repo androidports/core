@@ -10510,6 +10510,7 @@ if test "$_os" = "Linux"; then
         AC_MSG_RESULT([external])
         SYSTEM_GPGMEPP=TRUE
 
+        if test -z "$GPGMEPP_CFLAGS" -a -z "$GPGMEPP_LIBS"; then
         # C++ library doesn't come with fancy gpgmepp-config, check for headers the old-fashioned way
         AC_CHECK_HEADER(gpgme++/gpgmepp_version.h, [ GPGMEPP_CFLAGS=-I/usr/include/gpgme++ ],
             [AC_MSG_ERROR([gpgmepp headers not found, install gpgmepp development package])], [])
@@ -10519,6 +10520,7 @@ if test "$_os" = "Linux"; then
             [AC_MSG_ERROR(gpgmepp not found or not functional)], [])
         AC_CHECK_HEADER(gpgme.h, [],
             [AC_MSG_ERROR([gpgme headers not found, install gpgme development package])], [])
+        fi
     else
         AC_MSG_RESULT([internal])
         BUILD_TYPE="$BUILD_TYPE LIBGPGERROR LIBASSUAN GPGMEPP"
