@@ -73,11 +73,13 @@ recently_used_file::recently_used_file() :
         if (nullptr == file_)
             throw "I/O error opening ~/.recently-used";
 
+#ifndef ANDROID_PORTS
         if (lockf(fileno(file_), F_LOCK, 0) != 0)
         {
             fclose(file_);
             throw "Cannot lock ~/.recently-used";
         }
+#endif
     }
     else
         throw "Cannot determine user home directory";
@@ -86,8 +88,10 @@ recently_used_file::recently_used_file() :
 
 recently_used_file::~recently_used_file()
 {
+#ifndef ANDROID_PORTS
     int ret = lockf(fileno(file_), F_ULOCK, 0);
     SAL_WARN_IF(ret != 0, "shell", "cannot unlock recently unused file");
+#endif
     fclose(file_);
 }
 
