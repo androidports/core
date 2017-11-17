@@ -18,6 +18,18 @@
 #include <formula/vectortoken.hxx>
 #include <sstream>
 
+#if defined(ANDROID) || defined(ANDROID_PORTS)
+namespace std
+{
+template <typename T> std::string to_string(const T& rNumber)
+{
+    std::ostringstream aStream;
+    aStream << rNumber;
+    return aStream.str();
+}
+}
+#endif
+
 namespace sc { namespace opencl {
 
 void OpDmax::GenSlidingWindowFunction(std::stringstream &ss,

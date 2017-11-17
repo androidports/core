@@ -41,7 +41,7 @@
 
 using namespace com::sun::star;
 
-#ifdef ANDROID
+#if defined(ANDROID) || defined(ANDROID_PORTS)
 namespace std
 {
 template <typename T> std::string to_string(const T& rNumber)
