@@ -17,7 +17,7 @@ else ifeq ($(OS),WNT)
 $(eval $(call gb_ExternalPackage_add_file,libetonyek,$(LIBO_LIB_FOLDER)/libetonyek-0.1.dll,src/lib/.libs/libetonyek-0.1.dll))
 else ifeq ($(DISABLE_DYNLOADING),)
 ifeq ($(ANDROID_PORTS),1)
-$(eval $(call gb_ExternalPackage_add_file,libetonyek,$(LIBO_LIB_FOLDER)/libetonyek-0.1-lo.so,src/lib/.libs/libetonyek-0.1-lo.so))
+$(eval $(call gb_ExternalPackage_add_file,libetonyek,$(LIBO_LIB_FOLDER)/libetonyek-0.1.so,src/lib/.libs/libetonyek-0.1-lo.so))
 else
 $(eval $(call gb_ExternalPackage_add_file,libetonyek,$(LIBO_LIB_FOLDER)/libetonyek-0.1-lo.so.1,src/lib/.libs/libetonyek-0.1-lo.so.1.0.$(ETONYEK_VERSION_MICRO)))
 endif
