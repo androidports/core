@@ -166,6 +166,11 @@ oslPipe SAL_CALL osl_psz_createPipe(const sal_Char *pszPipeName, oslPipeOptions 
     bool bNameTooLong = false;
     oslPipe  pPipe;
 
+#ifdef ANDROID_PORTS
+#elif defined(IPHONE)
+    strncpy(name, getenv("TEMP"), sizeof(name));
+    strncat(name, "/", sizeof(name));
+#else
     if (access(PIPEDEFAULTPATH, W_OK) == 0)
     {
         strncpy(name, PIPEDEFAULTPATH, sizeof(name));
@@ -179,6 +184,7 @@ oslPipe SAL_CALL osl_psz_createPipe(const sal_Char *pszPipeName, oslPipeOptions 
         return nullptr;
     }
     name[sizeof(name) - 1] = '\0';  // ensure the string is NULL-terminated
+#endif
     nNameLength = strlen(name);
     bNameTooLong = nNameLength > sizeof(name) - 2;
 
@@ -220,7 +226,11 @@ oslPipe SAL_CALL osl_psz_createPipe(const sal_Char *pszPipeName, oslPipeOptions 
         return nullptr;
 
     /* create socket */
+#ifdef ANDROID_PORTS
+    pPipe->m_Socket = socket(AF_LOCAL, SOCK_STREAM, PF_UNIX);
+#else
     pPipe->m_Socket = socket(AF_UNIX, SOCK_STREAM, 0);
+#endif
     if ( pPipe->m_Socket < 0 )
     {
         SAL_WARN("sal.osl.pipe", "socket() failed: " << strerror(errno));
@@ -242,6 +252,12 @@ oslPipe SAL_CALL osl_psz_createPipe(const sal_Char *pszPipeName, oslPipeOptions 
 
     SAL_INFO("sal.osl.pipe", "new pipe on fd " << pPipe->m_Socket << " '" << name << "'");
 
+#ifdef ANDROID_PORTS
+    addr.sun_family = AF_LOCAL;
+    addr.sun_path[0] = '\0';
+    strcpy(addr.sun_path+1, name);
+    len = 1 + strlen(name) + offsetof(struct sockaddr_un, sun_path);
+#else
     addr.sun_family = AF_UNIX;
     strncpy(addr.sun_path, name, sizeof(addr.sun_path) - 1);
 #if defined(FREEBSD)
@@ -249,11 +265,13 @@ oslPipe SAL_CALL osl_psz_createPipe(const sal_Char *pszPipeName, oslPipeOptions 
 #else
     len = sizeof(addr);
 #endif
+#endif
 
     if ( Options & osl_Pipe_CREATE )
     {
         struct stat status;
 
+#ifndef ANDROID_PORTS
         /* check if there exists an orphan filesystem entry */
         if ( ( stat(name, &status) == 0) &&
              ( S_ISSOCK(status.st_mode) || S_ISFIFO(status.st_mode) ) )
@@ -267,6 +285,7 @@ oslPipe SAL_CALL osl_psz_createPipe(const sal_Char *pszPipeName, oslPipeOptions 
 
             unlink(name);
         }
+#endif
 
         /* ok, fs clean */
         if ( bind(pPipe->m_Socket, reinterpret_cast<sockaddr *>(&addr), len) < 0 )
@@ -280,8 +299,10 @@ oslPipe SAL_CALL osl_psz_createPipe(const sal_Char *pszPipeName, oslPipeOptions 
         /*  Only give access to all if no security handle was specified, otherwise security
             depends on umask */
 
+#ifndef ANDROID_PORTS
         if ( !Security )
             chmod(name,S_IRWXU | S_IRWXG |S_IRWXO);
+#endif
 
         strncpy(pPipe->m_Name, name, sizeof(pPipe->m_Name) - 1);
 
@@ -292,7 +313,9 @@ oslPipe SAL_CALL osl_psz_createPipe(const sal_Char *pszPipeName, oslPipeOptions 
             // stat(name, &status) above, but the intervening call to bind makes
             // those two clearly unrelated, as it would fail if name existed at
             // that point in time:
+#ifndef ANDROID_PORTS
             unlink(name);   /* remove filesystem entry */
+#endif
             close (pPipe->m_Socket);
             destroyPipeImpl(pPipe);
             return nullptr;
@@ -302,14 +325,18 @@ oslPipe SAL_CALL osl_psz_createPipe(const sal_Char *pszPipeName, oslPipeOptions 
     }
 
     /* osl_pipe_OPEN */
+#ifndef ANDROID_PORTS
     if ( access(name, F_OK) != -1 )
     {
+#endif
         if ( connect( pPipe->m_Socket, reinterpret_cast<sockaddr *>(&addr), len) >= 0 )
         {
             return pPipe;
         }
         SAL_WARN("sal.osl.pipe", "connect() failed: " << strerror(errno));
+#ifndef ANDROID_PORTS
     }
+#endif
 
     close (pPipe->m_Socket);
     destroyPipeImpl(pPipe);
