@@ -215,6 +215,12 @@ $(eval $(call gb_Library_add_libs,gcc3_uno,\
 endif
 endif
 
+ifeq ($(ANDROID_PORTS),1)
+$(eval $(call gb_Library_add_cxxflags,gcc3_uno,\
+	-DANDROID \
+))
+endif
+
 ifeq ($(COM),GCC)
 ifneq ($(COM_IS_CLANG),TRUE)
 bridges_NON_CALL_EXCEPTIONS_FLAGS := -fnon-call-exceptions
