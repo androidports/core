@@ -27,4 +27,16 @@ $(eval $(call gb_Executable_add_cobjects,unopkg_bin,\
     desktop/source/pkgchk/unopkg/unopkg_main \
 ))
 
+ifeq ($(ANDROID_PORTS),1)
+
+$(eval $(call gb_Executable_add_cflags,soffice_bin,\
+    -fPIE \
+))
+
+$(eval $(call gb_Executable_add_ldflags,soffice_bin,\
+    -fPIE -pie \
+))
+
+endif
+
 # vim: set ts=4 sw=4 et:
