@@ -10,6 +10,7 @@
 $(eval $(call gb_Module_Module,test))
 
 ifneq (,$(filter DESKTOP,$(BUILD_TYPE)))
+ifneq ($(ANDROID_PORTS),1)
 
 $(eval $(call gb_Module_add_targets,test,\
     Library_test \
@@ -19,6 +20,7 @@ $(eval $(call gb_Module_add_targets,test,\
     Package_unittest \
 ))
 
+endif
 endif
 
 # vim: set noet sw=4 ts=4:

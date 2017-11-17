@@ -11,11 +11,13 @@
 $(eval $(call gb_Module_Module,unotest))
 
 ifneq (,$(filter DESKTOP,$(BUILD_TYPE)))
+ifneq ($(ANDROID_PORTS),1)
 $(eval $(call gb_Module_add_targets,unotest,\
 	Library_unobootstrapprotector \
 	Library_unoexceptionprotector \
 	Library_unotest \
 ))
+endif
 endif
 
 ifneq ($(ENABLE_JAVA),)
