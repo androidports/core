@@ -34,7 +34,7 @@ $(eval $(call gb_ExternalProject_register_targets,liborcus,\
 
 #$(if $(filter MSC,$(COM)),CPPFLAGS+="-DBOOST_ALL_NO_LIB") CXXFLAGS+="$(BOOST_CXXFLAGS))
 
-liborcus_LIBS=
+liborcus_LIBS=$(LIBS)
 ifneq ($(SYSTEM_ZLIB),)
 liborcus_LIBS+=-lz
 endif
@@ -112,6 +112,7 @@ $(call gb_ExternalProject_get_state_target,liborcus,build) :
 			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
 		&& $(if $(verbose),V=1) \
 		   $(MAKE) \
+			$(if $(liborcus_LIBS),LIBS='$(liborcus_LIBS)') \
 			CXXFLAGS='$(liborcus_CXXFLAGS) $(MDDS_CFLAGS)' \
 		$(if $(filter MACOSX,$(OS)),\
 			&& $(PERL) $(SRCDIR)/solenv/bin/macosx-change-install-names.pl shl OOO \
