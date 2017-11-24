@@ -22,4 +22,16 @@ $(eval $(call gb_Executable_add_exception_objects,xpdfimport,\
     sdext/source/pdfimport/xpdfwrapper/wrapper_gpl \
 ))
 
+ifeq ($(ANDROID_PORTS),1)
+
+$(eval $(call gb_Executable_add_cxxflags,xpdfimport,\
+    -fPIE \
+))
+
+$(eval $(call gb_Executable_add_ldflags,xpdfimport,\
+    -fPIE -pie \
+))
+
+endif
+
 # vim:set noet sw=4 ts=4:
