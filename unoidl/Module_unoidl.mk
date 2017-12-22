@@ -13,6 +13,8 @@ $(eval $(call gb_Module_add_targets,unoidl, \
     $(if $(filter DESKTOP,$(BUILD_TYPE)), \
         Executable_unoidl-read) \
     Library_unoidl \
+    $(if $(filter $(ANDROID_PORTS),1), \
+        Executable_unoidl-check) \
 ))
 
 $(eval $(call gb_Module_add_targets_for_build,unoidl, \
