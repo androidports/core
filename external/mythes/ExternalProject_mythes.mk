@@ -20,6 +20,7 @@ $(call gb_ExternalProject_get_state_target,mythes,build):
 		LIBS="$(gb_STDLIBS) $(LIBS)" ./configure --disable-shared --with-pic \
 		$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) gio_can_sniff=no) \
 		&& $(MAKE) \
+		LIBS="$(gb_STDLIBS) $(LIBS)" \
 	)
 
 # vim: set noet sw=4 ts=4:
